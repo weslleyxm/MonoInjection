@@ -1,8 +1,8 @@
 {
   "name": "com.mono-injection.package",
   "version": "1.0.0",
-  "displayName": "MonoInjection is a Unity dependency injection system for managing and resolving MonoBehaviour dependencies automatically",
-  "description": "Descrição breve do seu pacote.",
+  "displayName": "MonoInjection",
+  "description": "MonoInjection is a Unity dependency injection system for managing and resolving MonoBehaviour dependencies automatically",
   "unity": "2022.3",
   "author": {
     "name": "Weslley Xavier",
