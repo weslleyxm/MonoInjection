@@ -1,0 +1,17 @@
+{
+  "name": "com.mono-injection.package",
+  "version": "1.0.0",
+  "displayName": "MonoInjection is a Unity dependency injection system for managing and resolving MonoBehaviour dependencies automatically",
+  "description": "Descrição breve do seu pacote.",
+  "unity": "2022.3",
+  "author": {
+    "name": "Weslley Xavier",
+    "url": "https://github.com/weslleyxm"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/weslleyxm/mono-injection.git"
+  },
+  "keywords": ["unity", "package", "upm"],
+  "dependencies": {}
+}
