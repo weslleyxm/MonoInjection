@@ -2,6 +2,9 @@
 
 namespace MonoInjection
 {
-    [AttributeUsage(AttributeTargets.Field)]
-    public class InjectAttribute : Attribute { }
+    namespace MonoInjection
+    {
+        [AttributeUsage(AttributeTargets.Field)]
+        public class InjectAttribute : Attribute { }
+    }
 }

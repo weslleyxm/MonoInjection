@@ -1,3 +1,4 @@
+using MonoInjection.MonoInjection;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -14,6 +15,7 @@ namespace MonoInjection
             ResolveDependencies();
         }
 
+      
         private void InitializeScope()
         {
             foreach (var item in MonoDependencyResolver.Instance.Dependence)
