@@ -86,7 +86,7 @@ ServiceLocator.Clear(); // Clears all registered dependencies
 ### Handling Objects Instantiated After the Injection Frame
 Objects instantiated after the initial injection frame will not be automatically injected. To ensure they receive dependencies, use:
 ```csharp
-var instance = InjectionManager.Instantiate<YourClass>();
+var instance = InjectionManager.Instantiate(yourPrefab);
 ```
 This ensures that any new objects created at runtime also receive their required dependencies.
   
