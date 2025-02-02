@@ -89,11 +89,6 @@ Objects instantiated after the initial injection frame will not be automatically
 var instance = InjectionManager.Instantiate<YourClass>();
 ```
 This ensures that any new objects created at runtime also receive their required dependencies.
-
-## Notes
-- The system efficiently manages dependencies without unnecessary scanning
-- Support for non-`MonoBehaviour` classes is in development
-- **Dependencies are resolved automatically**, but explicit binding is available when needed
-
+  
 ## Contributions
 Contributions are welcome! Feel free to submit pull requests or open issues
