@@ -1,4 +1,4 @@
-using System;  
+using System;
 
 
 namespace MonoInjection
@@ -6,7 +6,7 @@ namespace MonoInjection
     public class ServiceBuilder<T> where T : class
     {
         public ServiceBuilder<T> FromComponentInHierarchy()
-        {  
+        {
 #if UNITY_6
             var component = UnityEngine.Object.FindObjectOfType(typeof(T)) as T;
 #else
@@ -18,12 +18,12 @@ namespace MonoInjection
             }
             ServiceLocator.InternalRegister(component);
             return this;
-        } 
+        }
 
         public ServiceBuilder<T> FromInstance(T instance)
         {
-            ServiceLocator.InternalRegister(instance);
+            ServiceLocator.InternalRegister(instance, typeof(T)); 
             return this;
-        } 
+        }
     }
 }
