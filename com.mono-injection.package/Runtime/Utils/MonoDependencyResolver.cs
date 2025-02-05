@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement;
 
 namespace MonoInjection
 {
+    /// <summary>
+    /// It uses SerializableDictionary to store lists of dependent and dependence types for each scene
+    /// </summary>
     [CreateAssetMenu(fileName = "MonoDependents", menuName = "MonoInjection/MonoDependents")]
     public class MonoDependencyResolver : ScriptableObject
     {
@@ -34,6 +37,11 @@ namespace MonoInjection
         public IReadOnlyList<string> Dependence =>
             dependence.TryGetValue(SceneName, out var list) ? list.Items : Array.Empty<string>();
 
+        /// <summary>
+        /// Adds a dependent type and its field dependencies to the resolver
+        /// </summary>
+        /// <param name="scriptType">The type of the dependent script</param>
+        /// <param name="fields">The fields that the script depends on</param>
         public void AddDependent(Type scriptType, params FieldInfo[] fields)
         {
             if (scriptType == null || fields == null || fields.Length == 0) return;
@@ -68,10 +76,13 @@ namespace MonoInjection
             }
         }
 
+        /// <summary>
+        /// Resets the resolver by clearing all dependents and dependencies
+        /// </summary>
         public void Reset()
         {
             dependents.Clear();
             dependence.Clear();
-        }    
+        }
     }
 }

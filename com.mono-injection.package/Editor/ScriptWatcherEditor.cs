@@ -18,6 +18,8 @@ namespace MonoInjection
         {
             if (!Application.isPlaying)
             {
+                MonoDependencyResolver.Instance.Reset();
+
                 MonoBehaviour[] components = GameObject.FindObjectsOfType<MonoBehaviour>();
 
                 foreach (Component component in components)
