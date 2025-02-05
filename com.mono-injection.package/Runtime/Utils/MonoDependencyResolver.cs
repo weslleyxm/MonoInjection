@@ -67,5 +67,11 @@ namespace MonoInjection
                 }
             }
         }
+
+        public void Reset()
+        {
+            dependents.Clear();
+            dependence.Clear();
+        }    
     }
 }
