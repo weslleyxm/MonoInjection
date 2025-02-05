@@ -81,8 +81,11 @@ namespace MonoInjection
         /// </summary>
         public void Reset()
         {
-            dependents.Clear();
-            dependence.Clear();
+            if (dependents.ContainsKey(SceneName))
+                dependents[SceneName] = new ListContainer<string>();
+
+            if (dependence.ContainsKey(SceneName))
+                dependence[SceneName] = new ListContainer<string>();
         }
     }
 }
