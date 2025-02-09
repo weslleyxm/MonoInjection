@@ -11,10 +11,22 @@ namespace MonoInjection
     /// </summary>
     public class InjectionManager : MonoBehaviour
     {
+        [SerializeField] private SerializableDictionary<string, InjectionIdentity> injectionIdentities = new();
+
         private void Awake()
         {
             InitializeScope();
             ResolveDependencies();
+        }
+
+        internal void Populate()
+        {
+            injectionIdentities = new SerializableDictionary<string, InjectionIdentity>(); 
+            var identities = FindObjectsOfType<InjectionIdentity>();
+            foreach (var identity in identities)
+            {
+                injectionIdentities.Add(identity.identity, identity);  
+            }
         }
 
         /// <summary>
@@ -23,24 +35,28 @@ namespace MonoInjection
         private void InitializeScope()
         {
             foreach (var item in MonoDependencyResolver.Instance.Dependence)
-            {
-                Type type = Type.GetType(item);
-                if (type == null)
-                {
-                    Debug.LogWarning($"Type not found: {item}");
-                    continue;
-                }
+            { 
+                Type type = Type.GetType(item.qualifiedName);
+                var monoBehaviour = GetObject(item.identity);
 
-                var monoBehaviour = GetMonoBehaviours(type).FirstOrDefault();
                 if (monoBehaviour != null)
                 {
-                    ServiceLocator.InternalRegister(monoBehaviour, type);
+                    object component = monoBehaviour.GetComponent(type);
+                    ServiceLocator.InternalRegister(component, type);    
                 }
                 else
                 {
                     Debug.LogWarning($"No MonoBehaviour instance found for type: {type}");
                 }
             }
+        }
+
+        public MonoBehaviour GetObject(string identity)
+        {
+            if (injectionIdentities.ContainsKey(identity))
+                return injectionIdentities[identity];
+
+            return null;
         }
 
         /// <summary>
@@ -50,44 +66,33 @@ namespace MonoInjection
         {
             foreach (var item in MonoDependencyResolver.Instance.Dependents)
             {
-                Type type = Type.GetType(item);
+                Type type = Type.GetType(item.qualifiedName);
                 if (type == null)
                 {
                     Debug.LogWarning($"Type not found: {item}");
                     continue;
                 }
 
-                foreach (var monoBehaviour in GetMonoBehaviours(type))
-                {
-                    SetDependencies(monoBehaviour);
-                }
+                SetDependencies(GetObject(item.identity), type); 
             }
         }
-
-        /// <summary>
-        /// Finds all MonoBehaviour instances of a given type
-        /// </summary>
-        /// <param name="type">The type of MonoBehaviour to find</param>
-        /// <returns>An array of MonoBehaviour instances</returns>
-        private MonoBehaviour[] GetMonoBehaviours(Type type) =>
-            FindObjectsOfType(type, true) as MonoBehaviour[] ?? Array.Empty<MonoBehaviour>();
 
         /// <summary>
         /// Sets the dependencies for a given MonoBehaviour instance
         /// </summary>
         /// <param name="behaviour">The MonoBehaviour instance</param>
-        private static void SetDependencies(MonoBehaviour behaviour)
-        {
-            if (behaviour == null) return;
+        private static void SetDependencies(MonoBehaviour behaviour, Type type)
+        { 
+            if (behaviour == null) return; 
+            var component = behaviour.GetComponent(type); 
 
-            Type type = behaviour.GetType();
             foreach (var field in GetFieldInfos(type))
             {
                 var instance = ServiceLocator.Resolve(field.FieldType);
                 if (instance != null)
-                {
-                    field.SetValue(behaviour, instance);
-                }
+                { 
+                    field.SetValue(component, instance);
+                } 
                 else
                 {
                     Debug.LogWarning($"Could not find an instance for \"{field.FieldType}\" in {type}");
@@ -123,7 +128,7 @@ namespace MonoInjection
                 var instance = MonoBehaviour.Instantiate(prefab);
                 foreach (var mono in instance.GetComponentsInChildren<MonoBehaviour>())
                 {
-                    SetDependencies(mono);
+                    //SetDependencies(mono);
                 }
             }
             else

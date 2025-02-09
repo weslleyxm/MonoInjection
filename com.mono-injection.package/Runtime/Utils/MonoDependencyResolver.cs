@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,13 +9,15 @@ namespace MonoInjection
 {
     /// <summary>
     /// It uses SerializableDictionary to store lists of dependent and dependence types for each scene
-    /// </summary>
-    [CreateAssetMenu(fileName = "MonoDependents", menuName = "MonoInjection/MonoDependents")]
+    /// </summary> 
     public class MonoDependencyResolver : ScriptableObject
     {
-        [SerializeField] private SerializableDictionary<string, ListContainer<string>> dependents = new();
-        [SerializeField] private SerializableDictionary<string, ListContainer<string>> dependence = new();
+        [SerializeField] private SerializableDictionary<string, ListContainer<Identity>> dependents = new();
+        [SerializeField] private SerializableDictionary<string, ListContainer<Identity>> dependence = new();
 
+#if UNITY_EDITOR
+        [SerializeField] private static InjectionManager injectionManager;
+#endif
         private static MonoDependencyResolver monoDependents;
         public static MonoDependencyResolver Instance
         {
@@ -22,6 +25,9 @@ namespace MonoInjection
             {
                 if (monoDependents == null)
                 {
+#if UNITY_EDITOR
+                    injectionManager = FindObjectOfType<InjectionManager>();
+#endif
                     monoDependents = Resources.Load<MonoDependencyResolver>("MonoDependents");
                 }
 
@@ -31,11 +37,11 @@ namespace MonoInjection
 
         private string SceneName => SceneManager.GetActiveScene().name;
 
-        public IReadOnlyList<string> Dependents =>
-            dependents.TryGetValue(SceneName, out var list) ? list.Items : Array.Empty<string>();
+        public IReadOnlyList<Identity> Dependents =>
+            dependents.TryGetValue(SceneName, out var list) ? list.Items : Array.Empty<Identity>();
 
-        public IReadOnlyList<string> Dependence =>
-            dependence.TryGetValue(SceneName, out var list) ? list.Items : Array.Empty<string>();
+        public IReadOnlyList<Identity> Dependence =>
+            dependence.TryGetValue(SceneName, out var list) ? list.Items : Array.Empty<Identity>();
 
         /// <summary>
         /// Adds a dependent type and its field dependencies to the resolver
@@ -51,29 +57,36 @@ namespace MonoInjection
 
             if (!dependents.TryGetValue(SceneName, out var dependentList))
             {
-                dependentList = new ListContainer<string>();
+                dependentList = new ListContainer<Identity>();
                 dependents[SceneName] = dependentList;
             }
 
-            if (!dependentList.Contains(qualifiedName))
+            dependentList.Add(new Identity
             {
-                dependentList.Add(qualifiedName);
-            }
+                identity = scriptType.GetIdentity(),
+                qualifiedName = qualifiedName,
+            });
 
             if (!dependence.TryGetValue(SceneName, out var dependenceList))
             {
-                dependenceList = new ListContainer<string>();
+                dependenceList = new ListContainer<Identity>();
                 dependence[SceneName] = dependenceList;
             }
 
             foreach (var field in fields)
             {
                 string dependenceQualifiedName = field.FieldType.AssemblyQualifiedName;
-                if (dependenceQualifiedName != null && !dependenceList.Contains(dependenceQualifiedName))
+
+                dependenceList.Add(new Identity
                 {
-                    dependenceList.Add(dependenceQualifiedName);
-                }
+                    identity = field.FieldType.GetIdentity(),
+                    qualifiedName = dependenceQualifiedName,
+                });
             }
+
+#if UNITY_EDITOR
+            injectionManager.Populate();
+#endif
         }
 
         /// <summary>
@@ -82,10 +95,10 @@ namespace MonoInjection
         public void Reset()
         {
             if (dependents.ContainsKey(SceneName))
-                dependents[SceneName] = new ListContainer<string>();
+                dependents[SceneName] = new();
 
             if (dependence.ContainsKey(SceneName))
-                dependence[SceneName] = new ListContainer<string>();
+                dependence[SceneName] = new();
         }
     }
 }

@@ -1,15 +1,14 @@
 ﻿using UnityEditor;
-using UnityEngine;
-using System.Reflection;
+using UnityEngine; 
 using System;
 using System.Linq;
 
 namespace MonoInjection
 {
     [InitializeOnLoad]
-    public static class ScriptWatcherEditor
+    public static class InjectionWatchEditor
     {
-        static ScriptWatcherEditor()
+        static InjectionWatchEditor() 
         {
             EditorApplication.hierarchyChanged += CheckForNewScripts;
         }
@@ -28,11 +27,11 @@ namespace MonoInjection
 
                     var fieldsWithAttribute = InjectionManager.GetFieldInfos(type);
 
-                    if (fieldsWithAttribute.Any())
-                    {
+                    if (fieldsWithAttribute.Any()) 
+                    {   
                         MonoDependencyResolver.Instance.AddDependent(component.GetType(), fieldsWithAttribute.ToArray());
                     }
-                } 
+                }
             }
         }
     }

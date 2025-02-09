@@ -75,15 +75,8 @@ namespace MonoInjection
         /// <exception cref="Exception">Thrown when the service is already registered</exception>
         internal static void InternalRegister<T>(T service)
         {
-            Type serviceType = typeof(T);
-            Type concreteType = serviceType.IsInterface ? service.GetType() : serviceType;
-
-            if (_services.ContainsKey(concreteType))
-            {
-                throw new Exception($"Service of type {concreteType} is already registered!");
-            }
-
-            _services[concreteType] = service;
+            Type serviceType = typeof(T); 
+            _services[serviceType] = service;  
         }
 
         /// <summary>

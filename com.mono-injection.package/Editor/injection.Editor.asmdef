@@ -1,7 +1,9 @@
 {
-    "name": "com.mono-injection.package",
-    "rootNamespace": "MonoInjection",
-    "references": [],
+    "name": "com.mono-injection.editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:5ac239fcf0e1d4f40a5cc2fdd473c9ce"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

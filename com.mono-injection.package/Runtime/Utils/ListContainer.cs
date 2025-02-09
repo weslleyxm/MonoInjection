@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections.Generic; 
+using System.Collections.Generic;
+using System.Linq; 
 using UnityEngine;
 
 namespace MonoInjection
@@ -27,6 +28,8 @@ namespace MonoInjection
         /// <param name="item">The item to check for</param>
         /// <returns>True if the item is found in the list; otherwise, false</returns>
         public bool Contains(T item) => items.Contains(item);
+
+        public bool Contains(Func<T, bool> predicate) => items.Any(predicate);  
 
         /// <summary>
         /// Adds an item to the list
